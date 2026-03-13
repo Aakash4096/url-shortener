@@ -1,6 +1,6 @@
-const mangoose = require("mangoose");
+const mongoose = require("mongoose");
 
-const urlSchema = new mangoose.Schema({
+const urlSchema = new mongoose.Schema({
   originalUrl: {
     type: String,
     required: true,
@@ -20,4 +20,9 @@ const urlSchema = new mangoose.Schema({
     default: Date.now,
   },
 });
-module.exports = mangoose.model("Url", urlSchema);
+module.exports = mongoose.model("Url", urlSchema);
+// find shortCode
+// ↓
+// get originalUrl
+// ↓
+// redirect user

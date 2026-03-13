@@ -1,3 +1,4 @@
+console.log("APP FILE LOADED");
 const express = require("express");
 // GET
 // POST
@@ -18,6 +19,8 @@ const app = express();
 // app.post()
 // app.use()
 
+const urlRoutes = require("./routes/urlRoutes");
+
 app.use(cors());
 // use() means add middleware.
 
@@ -31,6 +34,8 @@ app.use(express.json()); //This middleware allows the server to read JSON data f
 // CORS → allow frontend requests
 
 //testing of routes
+
+app.use("/", urlRoutes);
 
 app.get("/", (req, res) => {
   res.send("This is the url shortener API");
