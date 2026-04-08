@@ -1,28 +1,16 @@
+// models/urlModel.js
 const mongoose = require("mongoose");
 
-const urlSchema = new mongoose.Schema({
-  originalUrl: {
-    type: String,
-    required: true,
+const urlSchema = new mongoose.Schema(
+  {
+    originalUrl: { type: String, required: true },
+    shortUrl: { type: String, required: true },
+    clicks: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
   },
-  shortUrl: {
-    type: String,
-    required: true,
+  {
+    collection: "url", // <-- match the name of your existing collection
   },
+);
 
-  clicks: {
-    type: Number,
-    default: 0,
-  },
-
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
 module.exports = mongoose.model("Url", urlSchema);
-// find shortCode
-// ↓
-// get originalUrl
-// ↓
-// redirect user

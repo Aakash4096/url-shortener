@@ -1,47 +1,71 @@
+// controllers/urlController.js
 const Url = require("../models/urlModel");
 
-function generateShortUrl() {
-  return Math.random().toString(36).substring(3, 9);
+// Generate a random short code
+async function generateShortUrl() {
+  let code;
+  let exists = true;
+  while (exists) {
+    code = Math.random().toString(36).substring(3, 9);
+    exists = await Url.findOne({ shortUrl: code });
+  }
+  return code;
 }
+// Get all shortened URLs
+exports.getAllUrls = async (req, res) => {
+  try {
+    const urls = await Url.find().sort({ createdAt: -1 }); // latest first
+    res.json(urls);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+// Create a shortened URL
 exports.createShortUrl = async (req, res) => {
   try {
     const { originalUrl } = req.body;
-    const shortUrl = generateShortUrl();
+
+    // Ensure originalUrl includes protocol
+    const formattedUrl =
+      originalUrl.startsWith("http://") || originalUrl.startsWith("https://")
+        ? originalUrl
+        : `https://${originalUrl}`;
+
+    const shortUrl = await generateShortUrl();
+
     const newUrl = new Url({
-      originalUrl,
+      originalUrl: formattedUrl,
       shortUrl,
     });
+
     await newUrl.save();
+
     res.json({
       shortUrl: `http://localhost:5000/${shortUrl}`,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 };
 
-// User sends URL
-//        ↓
-// API receives request
-//        ↓
-// generate short code
-//        ↓
-// store in MongoDB
-//        ↓
-// return shortened URL
-
+// Redirect short URL to original URL
 exports.redirectUrl = async (req, res) => {
-  // use 'req'!
   try {
-    const { shorturl } = req.params; // now this works
-    const url = await Url.findOne({ shortUrl: shorturl }); // check your field name in DB
+    const { shorturl } = req.params;
+
+    const url = await Url.findOne({ shortUrl: shorturl });
     if (!url) {
       return res.status(404).json({ error: "URL not found" });
     }
-    url.clicks = (url.clicks || 0) + 1; // increment clicks safely
+
+    url.clicks = (url.clicks || 0) + 1;
     await url.save();
+
     res.redirect(url.originalUrl);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 };

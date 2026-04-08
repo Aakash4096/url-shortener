@@ -1,17 +1,12 @@
 const express = require("express");
-const { createShortUrl, redirectUrl } = require("../controllers/urlController");
+const { createShortUrl, getAllUrls } = require("../controllers/urlController");
+
 const router = express.Router();
 
+// POST /api/shorten
 router.post("/shorten", createShortUrl);
-router.get("/:shorturl", redirectUrl);
+
+// GET /api/urls → return all short URLs
+router.get("/urls", getAllUrls);
 
 module.exports = router;
-// POST /shorten
-//       ↓
-// Express Router
-//       ↓
-// createShortUrl controller
-//       ↓
-// MongoDB insert
-//       ↓
-// Return short link
